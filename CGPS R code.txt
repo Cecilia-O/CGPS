@@ -1,0 +1,65 @@
+install.packages("data.table")
+library(data.table)
+DT <- fread("data.csv") 
+head(DT)
+
+#question 1: answer = 57 samples.
+q1 <- DT[confindr.contam_status.check_result=="FAILURE" & confindr.percentage_contamination.metric_value>=5.0,,]
+
+#question 2: answer = 49 samples.
+setnames(DT, "quast.# contigs (>= 1000 bp).metric_value", "quast.contigs.metric_value")
+head(DT)
+q2 <- DT[quast.contigs.metric_value<=50 & quast.N50.metric_value>=750000,,]
+
+#question 3:
+setnames(DT, "confindr.percentage_contamination.metric_value", "contamination_percent")
+setnames(DT, "quast.contigs.metric_value", "contigs")
+setnames(DT, "quast.N50.metric_value", "N50")
+setnames(DT, "quast.Total length (>= 1000 bp).metric_value", "Total length (>= 1000 bp)")
+head(DT)
+
+#question 4:
+install.packages("ggplot2")
+library(ggplot2)
+str(DT)
+setnames(DT, "Total length (>= 1000 bp)", "Total_length_1000_or_more_bp")
+boxplot <- ggplot(data = DT, aes(x = factor(0), y = Total_length_1000_or_more_bp)) +
+        geom_boxplot() +
+	theme(axis.title.x = element_blank())
+boxplot
+
+
+# question 6:
+q6_violin_1 <- ggplot(DT, aes(x="", y=contamination_percent)) + 
+  geom_violin() +
+  geom_jitter(shape=16, position=position_jitter(0.05))	+
+	theme(axis.title.x = element_blank())
+q6_violin_1
+
+q6_violin_2 <- ggplot(DT, aes(x="", y=contigs)) + 
+  geom_violin() +
+  geom_jitter(shape=16, position=position_jitter(0.05))	+
+	theme(axis.title.x = element_blank())
+q6_violin_2
+
+q6_violin_3 <- ggplot(DT, aes(x="", y=N50)) + 
+  geom_violin() +
+  geom_jitter(shape=16, position=position_jitter(0.05))	+
+	theme(axis.title.x = element_blank())
+q6_violin_3
+
+q6_violin_4 <- ggplot(DT, aes(x="", y=Total_length_1000_or_more_bp)) + 
+  geom_violin() +
+  geom_jitter(shape=16, position=position_jitter(0.05))	+
+	theme(axis.title.x = element_blank())
+q6_violin_4
+
+install.packages("cowplot")
+library("cowplot")
+violin <- plot_grid(q6_violin_1, q6_violin_2, q6_violin_3, q6_violin_4, ncol = 2, nrow = 2)
+violin
+
+
+
+
+
