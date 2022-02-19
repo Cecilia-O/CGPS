@@ -1,0 +1,26 @@
+# question 5:
+install.packages("tidyr")
+library("tidyr")
+install.packages("data.table")
+library(data.table)
+
+DT <- fread("data.csv") 
+str(DT)
+setnames(DT, "quast.# contigs (>= 1000 bp).metric_value", "quast.contigs.metric_value")
+setnames(DT, "confindr.percentage_contamination.metric_value", "contamination_percent")
+setnames(DT, "quast.contigs.metric_value", "contigs")
+setnames(DT, "quast.N50.metric_value", "N50")
+setnames(DT, "quast.Total length (>= 1000 bp).metric_value", "Total_length_1000_or_more_bp")
+
+DT_q5 <- DT[, .(sample_name,
+                contamination_percent,
+                contigs,
+                N50,
+                Total_length_1000_or_more_bp)]
+str(DT_q5)
+DT_q5$contigs <- as.numeric(DT_q5$contigs)
+DT_q5$N50 <- as.numeric(DT_q5$N50)
+DT_q5$Total_length_1000_or_more_bp <- as.numeric(DT_q5$Total_length_1000_or_more_bp)
+
+DT_q5 %>%
+pivot_longer(!sample_name, names_to = "metric", values_to = "value")
